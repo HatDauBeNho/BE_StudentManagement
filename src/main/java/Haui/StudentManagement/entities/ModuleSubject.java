@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="moduleSubjects")
+@Table(name="module_subjects")
 @Getter
 @Setter
 @AllArgsConstructor

@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class CreateMajorRequest
 {
     private String majorName;
-    private String deparmentName;
+    private String departmentName;
     private String fullName;
 }

@@ -25,7 +25,7 @@ public class ClassroomController {
     @Autowired
     private TeacherService teacherService;
 
-    @PostMapping("/createClassroom")
+    @PostMapping("/admin/createClassroom")
     public ResponseEntity<?> createClassroom(@RequestBody CreateClassroomRequest request) {
          try {
 
@@ -41,6 +41,7 @@ public class ClassroomController {
             classroom.setMajorId(majorService.findByName(request.getMajorName()).get().getMajorId());
             classroom.setTeacherId(teacherService.findByName(request.getFullName()).get().getTeacherId());
             classroom.setCreateAt(LocalDateTime.now());
+            classroom.setUpdatedAt(LocalDateTime.now());
              classroomService.save(classroom);
             return ResponseEntity.ok(new CustomResponse<>(1, null, "Success create classroom"));
 
@@ -50,7 +51,7 @@ public class ClassroomController {
         }
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/admin/getAll")
     public ResponseEntity<?> getAllClassroom(){
         try
         {
@@ -62,28 +63,37 @@ public class ClassroomController {
         }
     }
 
-    @PutMapping("/editClassroom")
+    @PutMapping("/admin/editClassroom")
     public ResponseEntity<?> editClassroom (@RequestBody EditClassroomRequest editClassroomRequest)
     {
         try
         {
+
             if (classroomService.findById(editClassroomRequest.getClassId()).isEmpty())
                 return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, "Class is not exits"));
             Classroom classroom=classroomService.findById(editClassroomRequest.getClassId()).get();
-            if (!editClassroomRequest.getClassName().equals(classroom.getClassName()))
-                classroom.setClassName(editClassroomRequest.getClassName());
-
-            if (majorService.findByName(editClassroomRequest.getMajorName()).isEmpty())
-                return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, "Major is not exits"));
-            if (!editClassroomRequest.getMajorName().equals(majorService.findById(classroom.getMajorId()).get().getMajorName())){
-                classroom.setMajorId(majorService.findByName(editClassroomRequest.getMajorName()).get().getMajorId());
+            if (editClassroomRequest.getClassName()!=null)
+            {
+                if (!editClassroomRequest.getClassName().equals(classroom.getClassName()))
+                    classroom.setClassName(editClassroomRequest.getClassName());
             }
 
-            if (teacherService.findByName(editClassroomRequest.getFullName()).isEmpty())
-                return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, "Teacher is not exits"));
-            if (!editClassroomRequest.getFullName().equals(teacherService.getTeacherInfor(classroom.getTeacherId()).get().getFullName()))
-                classroom.setTeacherId(teacherService.findByName(editClassroomRequest.getFullName()).get().getTeacherId());
-
+            if (editClassroomRequest.getMajorName()!=null)
+            {
+                if (majorService.findByName(editClassroomRequest.getMajorName()).isEmpty())
+                    return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, "Major is not exits"));
+                if (!editClassroomRequest.getMajorName().equals(majorService.findById(classroom.getMajorId()).get().getMajorName())){
+                    classroom.setMajorId(majorService.findByName(editClassroomRequest.getMajorName()).get().getMajorId());
+                }
+            }
+            if (editClassroomRequest.getFullName()!=null)
+            {
+                if (teacherService.findByName(editClassroomRequest.getFullName()).isEmpty())
+                    return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, "Teacher is not exits"));
+                if (!editClassroomRequest.getFullName().equals(teacherService.getTeacherInfor(classroom.getTeacherId()).get().getFullName()))
+                    classroom.setTeacherId(teacherService.findByName(editClassroomRequest.getFullName()).get().getTeacherId());
+            }
+            classroom.setUpdatedAt(LocalDateTime.now());
             classroomService.save(classroom);
             return ResponseEntity.ok(new CustomResponse<>(1, null, "Update success"));
 
@@ -93,7 +103,7 @@ public class ClassroomController {
         }
     }
 
-    @DeleteMapping("/deleteClassroom/{classId}")
+    @DeleteMapping("/admin/deleteClassroom/{classId}")
     public ResponseEntity<?> editClassroom(@PathVariable("classId") int classId)
     {
         try

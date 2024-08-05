@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface ModuleSubjectRepository extends JpaRepository<ModuleSubject,Integer> {
-    @Query(value = "SELECT * FROM moduleSubjects WHERE moduleSubjectName = ?1 LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM module_subjects WHERE moduleSubjectName = ?1 LIMIT 1", nativeQuery = true)
     Optional<ModuleSubject> findByName(String name);
 }

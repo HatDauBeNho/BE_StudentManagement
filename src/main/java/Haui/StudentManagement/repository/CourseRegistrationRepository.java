@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface CourseRegistrationRepository extends JpaRepository<CourseRegistration,Integer> {
-    @Query(value = "SELECT * FROM courseRegistrations WHERE courseRegistrationName = ?1 LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM course_registrations WHERE courseRegistrationName = ?1 LIMIT 1", nativeQuery = true)
     Optional<CourseRegistration> findByName(String name);
 }
