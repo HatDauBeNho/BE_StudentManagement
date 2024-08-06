@@ -1,7 +1,9 @@
 package Haui.StudentManagement.controller;
 
+import Haui.StudentManagement.custom.classroom.request.EditClassroomRequest;
 import Haui.StudentManagement.custom.data.reponse.CustomResponse;
 import Haui.StudentManagement.custom.major.request.CreateMajorRequest;
+import Haui.StudentManagement.custom.major.request.EditMajorRequest;
 import Haui.StudentManagement.entities.Major;
 import Haui.StudentManagement.service.DepartmentService;
 import Haui.StudentManagement.service.MajorService;
@@ -31,7 +33,7 @@ public class MajorController {
                 return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, "Department is not exists"));
             if (teacherService.findByName(request.getFullName()).isEmpty())
                 return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, "Teacher is not exists"));
-            Major major=new Major();
+            Major major = new Major();
             major.setMajorName(request.getMajorName());
             major.setDepartmentId(departmentService.findByName(request.getDepartmentName()).get().getDepartmentId());
             major.setTeacherId(teacherService.findByName(request.getFullName()).get().getTeacherId());
@@ -45,17 +47,64 @@ public class MajorController {
             return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, e.getMessage()));
         }
     }
+
     @GetMapping("/admin/getAll")
-    public ResponseEntity<?> getAllClassroom(){
-        try
-        {
+    public ResponseEntity<?> getAllMajor() {
+        try {
             return ResponseEntity.ok(new CustomResponse<>(1, majorService.findAllForView(), null));
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, e.getMessage()));
         }
     }
 
-
+    @PutMapping("/admin/editMajor")
+    public ResponseEntity<?> editMajor(@RequestBody EditMajorRequest request) {
+        try {
+            if (majorService.findById(request.getMajorId()).isEmpty())
+                return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, "Major is not exits"));
+            Major major = majorService.findById(request.getMajorId()).get();
+            if (request.getDepartmentName() != null) {
+                if (departmentService.findByName(request.getDepartmentName()).isEmpty())
+                    return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, "Department is not exits"));
+                if (!request.getDepartmentName().equals(departmentService.findById(major.getDepartmentId())))
+                    major.setDepartmentId(departmentService.findByName(request.getDepartmentName()).get().getDepartmentId());
+            }
+            if (request.getMajorName() != null) {
+                if (majorService.findByName(request.getMajorName()).isEmpty())
+                    return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, "Major is not exits"));
+                if (!request.getMajorName().equals(majorService.findById(request.getMajorId())))
+                    major.setMajorName(request.getMajorName());
+            }
+            if (request.getTeacherName() != null) {
+                if (teacherService.findByName(request.getTeacherName()).isEmpty())
+                    return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, "Teacher is not exits"));
+                if (!request.getTeacherName().equals(teacherService.getTeacherInfor(major.getTeacherId())))
+                    major.setTeacherId(teacherService.findByName(request.getTeacherName()).get().getTeacherId());
+            }
+            major.setUpdatedAt(LocalDateTime.now());
+            majorService.save(major);
+            return ResponseEntity.ok(new CustomResponse<>(1, null, "Update success"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, e.getMessage()));
+        }
+    }
+    @DeleteMapping("/admin/deleteMajor/{majorId}")
+    public ResponseEntity<?> editDepartment(@PathVariable("majorId") int majorId)
+    {
+        try
+        {
+            if (majorService.findById(majorId).isEmpty())
+                return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, "Major is not exits"));
+            majorService.deleteById(majorId);
+            return ResponseEntity.ok(new CustomResponse<>(1, null, "Success delete"));
+        }catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new CustomResponse<>(0, null, e.getMessage()));
+        }
+    }
 }
+
+
